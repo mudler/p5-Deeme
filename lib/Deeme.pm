@@ -4,7 +4,6 @@ use 5.008_005;
 our $VERSION = '0.01';
 use Mojo::Base -base;
 use Carp 'croak';
-use Deeme::Utils qw( _deserialize _serialize);
 
 has 'backend';
 
@@ -140,12 +139,124 @@ Deeme - a Database-agnostic driven Event Emitter
 
 =head1 SYNOPSIS
 
-  use Deeme;
+  package Cat;
+  use Mojo::Base 'Deeme';
+
+
+  package main
+  # Subscribe to events in an application (thread, fork, whatever)
+  my $tiger = Cat->new; #or you can just do Deeme->new
+  $tiger->on(roar => sub {
+    my ($tiger, $times) = @_;
+    say 'RAWR!' for 1 .. $times;
+  });
+
+   ...
+
+  #then, later in another application
+  $tiger->emit(roar => 3);
 
 =head1 DESCRIPTION
 
-Deeme is a database-agnostic driven event emitter.
-Deeme allows you to define binding subs on different points in multiple applications, and execute them inside your master worker.
+Deeme is a database-agnostic driven event emitter base-class.
+Deeme allows you to define binding subs on different points in multiple applications, and execute them later, in another worker. It is handy if you have to attach subs to events that are delayed in time and must be fixed. It is strongly inspired by (and a rework of) L<Mojo::EventEmitter>.
+
+=head1 EVENTS
+
+L<Deeme> can emit the following events.
+
+=head2 error
+
+  $e->on(error => sub {
+    my ($e, $err) = @_;
+    ...
+  });
+
+Emitted for event errors, fatal if unhandled.
+
+  $e->on(error => sub {
+    my ($e, $err) = @_;
+    say "This looks bad: $err";
+  });
+
+=head1 METHODS
+
+L<Deeme> inherits all methods from L<Mojo::Base> and
+implements the following new ones.
+
+=head2 catch
+
+  $e = $e->catch(sub {...});
+
+Subscribe to L</"error"> event.
+
+  # Longer version
+  $e->on(error => sub {...});
+
+=head2 emit
+
+  $e = $e->emit('foo');
+  $e = $e->emit('foo', 123);
+
+Emit event.
+
+=head2 emit_safe
+
+  $e = $e->emit_safe('foo');
+  $e = $e->emit_safe('foo', 123);
+
+Emit event safely and emit L</"error"> event on failure.
+
+=head2 has_subscribers
+
+  my $bool = $e->has_subscribers('foo');
+
+Check if event has subscribers.
+
+=head2 on
+
+  my $cb = $e->on(foo => sub {...});
+
+Subscribe to event.
+
+  $e->on(foo => sub {
+    my ($e, @args) = @_;
+    ...
+  });
+
+=head2 once
+
+  my $cb = $e->once(foo => sub {...});
+
+Subscribe to event and unsubscribe again after it has been emitted once.
+
+  $e->once(foo => sub {
+    my ($e, @args) = @_;
+    ...
+  });
+
+=head2 subscribers
+
+  my $subscribers = $e->subscribers('foo');
+
+All subscribers for event.
+
+  # Unsubscribe last subscriber
+  $e->unsubscribe(foo => $e->subscribers('foo')->[-1]);
+
+=head2 unsubscribe
+
+  $e = $e->unsubscribe('foo');
+  $e = $e->unsubscribe(foo => $cb);
+
+Unsubscribe from event.
+
+=head1 DEBUGGING
+
+You can set the C<DEEME_DEBUG> environment variable to get some
+advanced diagnostics information printed to C<STDERR>.
+
+  DEEME_DEBUG=1
 
 =head1 AUTHOR
 

@@ -1,17 +1,127 @@
 # NAME
 
-Deeme -  a Database-agnostic driven Event Emitter
+Deeme - a Database-agnostic driven Event Emitter
 
 # SYNOPSIS
 
-    use Deeme;
+    package Cat;
+    use Mojo::Base 'Deeme';
+
+
+    package main
+    # Subscribe to events in an application (thread, fork, whatever)
+    my $tiger = Cat->new; #or you can just do Deeme->new
+    $tiger->on(roar => sub {
+      my ($tiger, $times) = @_;
+      say 'RAWR!' for 1 .. $times;
+    });
+
+     ...
+
+    #then, later in another application
+    $tiger->emit(roar => 3);
 
 # DESCRIPTION
 
-Deeme is a database-agnostic driven event emitter.
-Deeme allows you to define binding subs on different points in multiple applications, and execute them inside your master worker.
+Deeme is a database-agnostic driven event emitter base-class.
+Deeme allows you to define binding subs on different points in multiple applications, and execute them later, in another worker. It is handy if you have to attach subs to events that are delayed in time and must be fixed. It is strongly inspired by (and a rework of) [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter).
 
-Still work in progress.
+# EVENTS
+
+[Deeme](https://metacpan.org/pod/Deeme) can emit the following events.
+
+## error
+
+    $e->on(error => sub {
+      my ($e, $err) = @_;
+      ...
+    });
+
+Emitted for event errors, fatal if unhandled.
+
+    $e->on(error => sub {
+      my ($e, $err) = @_;
+      say "This looks bad: $err";
+    });
+
+# METHODS
+
+[Deeme](https://metacpan.org/pod/Deeme) inherits all methods from [Mojo::Base](https://metacpan.org/pod/Mojo::Base) and
+implements the following new ones.
+
+## catch
+
+    $e = $e->catch(sub {...});
+
+Subscribe to ["error"](#error) event.
+
+    # Longer version
+    $e->on(error => sub {...});
+
+## emit
+
+    $e = $e->emit('foo');
+    $e = $e->emit('foo', 123);
+
+Emit event.
+
+## emit\_safe
+
+    $e = $e->emit_safe('foo');
+    $e = $e->emit_safe('foo', 123);
+
+Emit event safely and emit ["error"](#error) event on failure.
+
+## has\_subscribers
+
+    my $bool = $e->has_subscribers('foo');
+
+Check if event has subscribers.
+
+## on
+
+    my $cb = $e->on(foo => sub {...});
+
+Subscribe to event.
+
+    $e->on(foo => sub {
+      my ($e, @args) = @_;
+      ...
+    });
+
+## once
+
+    my $cb = $e->once(foo => sub {...});
+
+Subscribe to event and unsubscribe again after it has been emitted once.
+
+    $e->once(foo => sub {
+      my ($e, @args) = @_;
+      ...
+    });
+
+## subscribers
+
+    my $subscribers = $e->subscribers('foo');
+
+All subscribers for event.
+
+    # Unsubscribe last subscriber
+    $e->unsubscribe(foo => $e->subscribers('foo')->[-1]);
+
+## unsubscribe
+
+    $e = $e->unsubscribe('foo');
+    $e = $e->unsubscribe(foo => $cb);
+
+Unsubscribe from event.
+
+# DEBUGGING
+
+You can set the `DEEME_DEBUG` environment variable to get some
+advanced diagnostics information printed to `STDERR`.
+
+    DEEME_DEBUG=1
 
 # AUTHOR
 
