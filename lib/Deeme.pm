@@ -123,7 +123,6 @@ sub _unsubscribe_index {
     my $ev = [@events];
     $self->backend->event_delete($name) and return $self
         unless @{$ev};
-    say "Unsubscribing $index";
     $self->backend->event_update( $name, $ev, 0 );
     $self->backend->once_update( $name, \@onces );
 
