@@ -16,11 +16,14 @@ my $Deeme = Deeme->new(
 );
 
 
-$Deeme->on(roar => sub {
+$Deeme->once(roar => sub {
   my ($tiger, $times) = @_;
-  say 'RAWR!' for 1 .. $times;
+  say 'RAWR! , You should see me only once' for 1 .. $times;
 });
-say "EMITTING";
-$Deeme->emit(roar => 3);
+
+
+$Deeme->emit(roar => 1);
+$Deeme->emit(roar => 1);
+
 
 # replace with the actual test

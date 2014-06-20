@@ -4,6 +4,7 @@ use 5.008_005;
 our $VERSION = '0.01';
 use Mojo::Base -base;
 use Carp 'croak';
+use Deeme::Utils qw( _deserialize _serialize);
 
 has 'backend';
 
@@ -27,8 +28,13 @@ sub emit {
     if ( my $s = $self->backend->events_get($name) ) {
         warn "-- Emit $name in @{[blessed $self]} (@{[scalar @$s]})\n"
             if DEBUG;
+        my @onces = $self->backend->events_onces($name);
+        my $i     = 0;
         for my $cb (@$s) {
             $self->$cb(@_);
+            ( $onces[$i] == 1 )
+                ? ( $self->_unsubscribe_index( $name => $i ) )
+                : $i++;
         }
     }
     else {
@@ -45,10 +51,15 @@ sub emit_safe {
     if ( my $s = $self->backend->events_get($name) ) {
         warn "-- Emit $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
             if DEBUG;
+        my @onces = $self->backend->events_onces($name);
+        my $i     = 0;
         for my $cb (@$s) {
             $self->emit( error => qq{Event "$name" failed: $@} )
                 unless eval {
                 $self->$cb(@_);
+                ( $onces[$i] == 1 )
+                    ? ( $self->_unsubscribe_index( $name => $i ) )
+                    : $i++;
                 1;
                 };
         }
@@ -65,23 +76,12 @@ sub has_subscribers { !!@{ shift->subscribers(shift) } }
 
 sub on {
     my ( $self, $name, $cb ) = @_;
-    $self->backend->event_add( $name, $cb ||= [] );
-    return $cb;
+    return $self->backend->event_add( $name, $cb ||= [], 0 );
 }
 
 sub once {
     my ( $self, $name, $cb ) = @_;
-
-    weaken $self;
-    my $wrapper;
-    $wrapper = sub {
-        $self->unsubscribe( $name => $wrapper );
-        $cb->(@_);
-    };
-    $self->on( $name => $wrapper );
-    weaken $wrapper;
-
-    return $wrapper;
+    return $self->backend->event_add( $name, $cb ||= [], 1 );
 }
 
 sub subscribers { shift->backend->events_get( shift() ) || [] }
@@ -91,15 +91,41 @@ sub unsubscribe {
 
     # One
     if ($cb) {
-        my $events
-            = [ grep { q($cb) ne $_ } @{ $self->backend->events_get($name) } ];
-        $self->backend->event_delete($name) and return $self
-            unless @{$events};
-        $self->backend->event_update( $name, $events );
+        my @events = @{ $self->backend->events_get( $name, 0 ) };
+        my @onces = $self->backend->events_onces($name);
+
+        my ($index) = grep { $cb eq $events[$_] } 0 .. $#events;
+        if ($index) {
+            splice @events, $index, 1;
+            splice @onces,  $index, 1;
+            my $ev = [@events];
+            $self->backend->event_delete($name) and return $self
+                unless @{$ev};
+            $self->backend->event_update( $name, $ev, 0 );
+            $self->backend->once_update( $name, \@onces );
+        }
     }
 
     # All
     else { $self->backend->event_delete($name); }
+
+    return $self;
+}
+
+sub _unsubscribe_index {
+    my ( $self, $name, $index ) = @_;
+
+    my @events = @{ $self->backend->events_get( $name, 0 ) };
+    my @onces = $self->backend->events_onces($name);
+
+    splice @events, $index, 1;
+    splice @onces,  $index, 1;
+    my $ev = [@events];
+    $self->backend->event_delete($name) and return $self
+        unless @{$ev};
+    say "Unsubscribing $index";
+    $self->backend->event_update( $name, $ev, 0 );
+    $self->backend->once_update( $name, \@onces );
 
     return $self;
 }
