@@ -9,7 +9,7 @@ Deeme - a Database-agnostic driven Event Emitter
     use Deeme::Backend::Meerkat;
 
     # app1.pl
-    package main
+    package main;
     # Subscribe to events in an application (thread, fork, whatever)
     my $tiger = Cat->new(backend=> Deeme::Backend::Meerkat->new(...) ); #or you can just do Deeme->new
     $tiger->on(roar => sub {
