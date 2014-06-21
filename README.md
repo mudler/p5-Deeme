@@ -7,7 +7,7 @@ Deeme - a Database-agnostic driven Event Emitter
     package Cat;
     use Mojo::Base 'Deeme';
 
-
+    # app1.pl
     package main
     # Subscribe to events in an application (thread, fork, whatever)
     my $tiger = Cat->new; #or you can just do Deeme->new
@@ -19,6 +19,8 @@ Deeme - a Database-agnostic driven Event Emitter
      ...
 
     #then, later in another application
+    # app2.pl
+    my $tiger = Cat->new;
     $tiger->emit(roar => 3);
 
 # DESCRIPTION
@@ -64,6 +66,12 @@ Subscribe to ["error"](#error) event.
     $e = $e->emit('foo', 123);
 
 Emit event.
+
+## reset
+
+    $e = $e->reset;
+
+Delete all events on the backend.
 
 ## emit\_safe
 
@@ -137,3 +145,5 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 # SEE ALSO
+
+    L<Mojo::EventEmitter>, L<Mojolicious>
