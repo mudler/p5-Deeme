@@ -146,4 +146,4 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-    L<Mojo::EventEmitter>, L<Mojolicious>
+    L<Deeme::Backend::Memory>, L<Deeme::Backend::Meerkat>, L<Mojo::EventEmitter>, L<Mojolicious>
