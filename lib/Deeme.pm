@@ -4,9 +4,7 @@ use 5.008_005;
 our $VERSION = '0.01';
 use Mojo::Base -base;
 use Carp 'croak';
-
 has 'backend';
-
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{DEEME_DEBUG} || 0;
@@ -30,10 +28,15 @@ sub emit {
         my @onces = $self->backend->events_onces($name);
         my $i     = 0;
         for my $cb (@$s) {
+            if ( $onces[$i] == 1 ) {
+                splice @onces, $i, 1;
+                $self->_unsubscribe_index( $name => $i );
+            }
+            else {
+                $i++;
+            }
             $self->$cb(@_);
-            ( $onces[$i] == 1 )
-                ? ( $self->_unsubscribe_index( $name => $i ) )
-                : $i++;
+
         }
     }
     else {
@@ -55,10 +58,15 @@ sub emit_safe {
         for my $cb (@$s) {
             $self->emit( error => qq{Event "$name" failed: $@} )
                 unless eval {
+                if ( $onces[$i] == 1 ) {
+                    splice @onces, $i, 1;
+                    $self->_unsubscribe_index( $name => $i );
+                }
+                else {
+                    $i++;
+                }
                 $self->$cb(@_);
-                ( $onces[$i] == 1 )
-                    ? ( $self->_unsubscribe_index( $name => $i ) )
-                    : $i++;
+
                 1;
                 };
         }
@@ -83,7 +91,7 @@ sub once {
     return $self->backend->event_add( $name, $cb ||= [], 1 );
 }
 
-sub subscribers { shift->backend->events_get( shift() ) || [] }
+sub subscribers { shift->backend->events_get( shift(), 0 ) || [] }
 
 sub unsubscribe {
     my ( $self, $name, $cb ) = @_;
@@ -94,13 +102,13 @@ sub unsubscribe {
         my @onces = $self->backend->events_onces($name);
 
         my ($index) = grep { $cb eq $events[$_] } 0 .. $#events;
-        if ($index) {
+        if ( defined $index ) {
+
             splice @events, $index, 1;
             splice @onces,  $index, 1;
-            my $ev = [@events];
             $self->backend->event_delete($name) and return $self
-                unless @{$ev};
-            $self->backend->event_update( $name, $ev, 0 );
+                unless @events;
+            $self->backend->event_update( $name, \@events, 0 );
             $self->backend->once_update( $name, \@onces );
         }
     }
@@ -108,6 +116,12 @@ sub unsubscribe {
     # All
     else { $self->backend->event_delete($name); }
 
+    return $self;
+}
+
+sub reset {
+    my $self = shift;
+    $self->backend->events_reset;
     return $self;
 }
 
@@ -119,10 +133,9 @@ sub _unsubscribe_index {
 
     splice @events, $index, 1;
     splice @onces,  $index, 1;
-    my $ev = [@events];
     $self->backend->event_delete($name) and return $self
-        unless @{$ev};
-    $self->backend->event_update( $name, $ev, 0 );
+        unless @events;
+    $self->backend->event_update( $name, [@events], 0 );
     $self->backend->once_update( $name, \@onces );
 
     return $self;
@@ -142,7 +155,7 @@ Deeme - a Database-agnostic driven Event Emitter
   package Cat;
   use Mojo::Base 'Deeme';
 
-
+  # app1.pl
   package main
   # Subscribe to events in an application (thread, fork, whatever)
   my $tiger = Cat->new; #or you can just do Deeme->new
@@ -154,6 +167,8 @@ Deeme - a Database-agnostic driven Event Emitter
    ...
 
   #then, later in another application
+  # app2.pl
+  my $tiger = Cat->new;
   $tiger->emit(roar => 3);
 
 =head1 DESCRIPTION
@@ -199,6 +214,12 @@ Subscribe to L</"error"> event.
   $e = $e->emit('foo', 123);
 
 Emit event.
+
+=head2 reset
+
+  $e = $e->reset;
+
+Delete all events on the backend.
 
 =head2 emit_safe
 
@@ -272,5 +293,7 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 SEE ALSO
+
+ L<Mojo::EventEmitter>, L<Mojolicious>
 
 =cut

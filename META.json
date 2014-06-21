@@ -1,5 +1,5 @@
 {
-   "abstract" : "Blah blah blah",
+   "abstract" : "a Database-agnostic driven Event Emitter",
    "author" : [
       "mudler <mudler@dark-lab.net>"
    ],
@@ -46,6 +46,17 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mudler/p5-Deeme/issues"
+      },
+      "homepage" : "https://github.com/mudler/p5-Deeme",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mudler/p5-Deeme.git",
+         "web" : "https://github.com/mudler/p5-Deeme"
+      }
+   },
    "version" : "0.01"
 }
 
