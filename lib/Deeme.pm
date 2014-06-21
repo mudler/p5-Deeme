@@ -154,11 +154,12 @@ Deeme - a Database-agnostic driven Event Emitter
 
   package Cat;
   use Mojo::Base 'Deeme';
+  use Deeme::Backend::Meerkat;
 
   # app1.pl
   package main
   # Subscribe to events in an application (thread, fork, whatever)
-  my $tiger = Cat->new; #or you can just do Deeme->new
+  my $tiger = Cat->new(backend=> Deeme::Backend::Meerkat->new(...) ); #or you can just do Deeme->new
   $tiger->on(roar => sub {
     my ($tiger, $times) = @_;
     say 'RAWR!' for 1 .. $times;
@@ -168,7 +169,7 @@ Deeme - a Database-agnostic driven Event Emitter
 
   #then, later in another application
   # app2.pl
-  my $tiger = Cat->new;
+  my $tiger = Cat->new(backend=> Deeme::Backend::Meerkat->new(...));
   $tiger->emit(roar => 3);
 
 =head1 DESCRIPTION
