@@ -295,6 +295,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Deeme::Backend::Memory>, L<Deeme::Backend::Meerkat>, L<Mojo::EventEmitter>, L<Mojolicious>
+L<Deeme::Backend::Memory>, L<Deeme::Backend::Mango>, L<Deeme::Backend::Meerkat>, L<Mojo::EventEmitter>, L<Mojolicious>
 
 =cut

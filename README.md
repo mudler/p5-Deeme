@@ -147,4 +147,4 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[Deeme::Backend::Memory](https://metacpan.org/pod/Deeme::Backend::Memory), [Deeme::Backend::Meerkat](https://metacpan.org/pod/Deeme::Backend::Meerkat), [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter), [Mojolicious](https://metacpan.org/pod/Mojolicious)
+[Deeme::Backend::Memory](https://metacpan.org/pod/Deeme::Backend::Memory), [Deeme::Backend::Mango](https://metacpan.org/pod/Deeme::Backend::Mango), [Deeme::Backend::Meerkat](https://metacpan.org/pod/Deeme::Backend::Meerkat), [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter), [Mojolicious](https://metacpan.org/pod/Mojolicious)
