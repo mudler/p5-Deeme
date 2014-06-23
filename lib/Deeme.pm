@@ -24,19 +24,15 @@ sub emit {
 
     if ( my $s = $self->backend->events_get($name) ) {
         warn "-- Emit $name in @{[blessed $self]} (@{[scalar @$s]})\n"
-            if DEBUG;
+          if DEBUG;
         my @onces = $self->backend->events_onces($name);
         my $i     = 0;
         for my $cb (@$s) {
-            if ( $onces[$i] == 1 ) {
-                splice @onces, $i, 1;
-                $self->_unsubscribe_index( $name => $i );
-            }
-            else {
-                $i++;
-            }
+            ( $onces[$i] == 1 )
+              ? ( splice( @onces, $i, 1 )
+                  and $self->_unsubscribe_index( $name => $i ) )
+              : $i++;
             $self->$cb(@_);
-
         }
     }
     else {
@@ -52,23 +48,19 @@ sub emit_safe {
 
     if ( my $s = $self->backend->events_get($name) ) {
         warn "-- Emit $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
-            if DEBUG;
+          if DEBUG;
         my @onces = $self->backend->events_onces($name);
         my $i     = 0;
         for my $cb (@$s) {
             $self->emit( error => qq{Event "$name" failed: $@} )
-                unless eval {
-                if ( $onces[$i] == 1 ) {
-                    splice @onces, $i, 1;
-                    $self->_unsubscribe_index( $name => $i );
-                }
-                else {
-                    $i++;
-                }
+              unless eval {
+                ( $onces[$i] == 1 )
+                  ? ( splice( @onces, $i, 1 )
+                      and $self->_unsubscribe_index( $name => $i ) )
+                  : $i++;
                 $self->$cb(@_);
-
                 1;
-                };
+              };
         }
     }
     else {
@@ -107,7 +99,7 @@ sub unsubscribe {
             splice @events, $index, 1;
             splice @onces,  $index, 1;
             $self->backend->event_delete($name) and return $self
-                unless @events;
+              unless @events;
             $self->backend->event_update( $name, \@events, 0 );
             $self->backend->once_update( $name, \@onces );
         }
@@ -134,7 +126,7 @@ sub _unsubscribe_index {
     splice @events, $index, 1;
     splice @onces,  $index, 1;
     $self->backend->event_delete($name) and return $self
-        unless @events;
+      unless @events;
     $self->backend->event_update( $name, [@events], 0 );
     $self->backend->once_update( $name, \@onces );
 
