@@ -1,5 +1,5 @@
 package Deeme::Backend;
-use Mojo::Base -base;
+use Deeme::Obj -base;
 use B::Deparse;
 use Carp 'croak';
 

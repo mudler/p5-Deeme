@@ -3,7 +3,7 @@ package Deeme::Backend::Memory;
 use strict;
 use 5.008_005;
 our $VERSION = '0.01';
-use Mojo::Base 'Deeme::Backend';
+use Deeme::Obj 'Deeme::Backend';
 use Carp 'croak';
 
 sub events_get {
