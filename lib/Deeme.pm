@@ -145,7 +145,7 @@ Deeme - a Database-agnostic driven Event Emitter
 =head1 SYNOPSIS
 
   package Cat;
-  use Mojo::Base 'Deeme';
+  use Deeme::Obj 'Deeme';
   use Deeme::Backend::Meerkat;
 
   # app1.pl
@@ -189,7 +189,7 @@ Emitted for event errors, fatal if unhandled.
 
 =head1 METHODS
 
-L<Deeme> inherits all methods from L<Mojo::Base> and
+L<Deeme> inherits all methods from L<Deeme::Obj> and
 implements the following new ones.
 
 =head2 catch
