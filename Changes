@@ -1,6 +1,8 @@
 Revision history for Deeme
 
 {{$NEXT}}
+
+0.02  2014-06-24 11:17:43 CEST
         - Created Deeme::Obj to get rid of all Mojolicious deps
         - Defaulting to Deeme::Backend::Memory if backend option is not specified
 
