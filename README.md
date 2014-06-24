@@ -5,7 +5,7 @@ Deeme - a Database-agnostic driven Event Emitter
 # SYNOPSIS
 
     package Cat;
-    use Mojo::Base 'Deeme';
+    use Deeme::Obj 'Deeme';
     use Deeme::Backend::Meerkat;
 
     # app1.pl
@@ -49,7 +49,7 @@ Emitted for event errors, fatal if unhandled.
 
 # METHODS
 
-[Deeme](https://metacpan.org/pod/Deeme) inherits all methods from [Mojo::Base](https://metacpan.org/pod/Mojo::Base) and
+[Deeme](https://metacpan.org/pod/Deeme) inherits all methods from [Deeme::Obj](https://metacpan.org/pod/Deeme::Obj) and
 implements the following new ones.
 
 ## catch

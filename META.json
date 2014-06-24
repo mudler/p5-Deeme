@@ -26,8 +26,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035",
-            "perl" : "5.008005"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -38,7 +37,6 @@
       "runtime" : {
          "requires" : {
             "MIME::Base64" : "0",
-            "Mojo::Base" : "0",
             "Scalar::Util" : "0",
             "feature" : "0",
             "perl" : "5.008_005"
@@ -62,6 +60,6 @@
          "web" : "https://github.com/mudler/p5-Deeme"
       }
    },
-   "version" : "0.01"
+   "version" : "0.02"
 }
 
