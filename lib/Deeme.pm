@@ -6,13 +6,16 @@ use Deeme::Obj -base;
 use Carp 'croak';
 has 'backend';
 use Scalar::Util qw(blessed weaken);
-
 use constant DEBUG => $ENV{DEEME_DEBUG} || 0;
 
 sub new {
     my $self = shift;
     $self = $self->SUPER::new(@_);
-    croak("No backend defined") if !$self->backend;
+    if ( !$self->backend ) {
+        warn 'No backend defined, defaulting to Deeme::Backend::Memory';
+        use Deeme::Backend::Memory;
+        $self->backend( Deeme::Backend::Memory->new );
+    }
     $self->backend->deeme($self);
     return $self;
 }
@@ -24,14 +27,14 @@ sub emit {
 
     if ( my $s = $self->backend->events_get($name) ) {
         warn "-- Emit $name in @{[blessed $self]} (@{[scalar @$s]})\n"
-          if DEBUG;
+            if DEBUG;
         my @onces = $self->backend->events_onces($name);
         my $i     = 0;
         for my $cb (@$s) {
             ( $onces[$i] == 1 )
-              ? ( splice( @onces, $i, 1 )
-                  and $self->_unsubscribe_index( $name => $i ) )
-              : $i++;
+                ? ( splice( @onces, $i, 1 )
+                    and $self->_unsubscribe_index( $name => $i ) )
+                : $i++;
             $self->$cb(@_);
         }
     }
@@ -48,19 +51,19 @@ sub emit_safe {
 
     if ( my $s = $self->backend->events_get($name) ) {
         warn "-- Emit $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
-          if DEBUG;
+            if DEBUG;
         my @onces = $self->backend->events_onces($name);
         my $i     = 0;
         for my $cb (@$s) {
             $self->emit( error => qq{Event "$name" failed: $@} )
-              unless eval {
+                unless eval {
                 ( $onces[$i] == 1 )
-                  ? ( splice( @onces, $i, 1 )
-                      and $self->_unsubscribe_index( $name => $i ) )
-                  : $i++;
+                    ? ( splice( @onces, $i, 1 )
+                        and $self->_unsubscribe_index( $name => $i ) )
+                    : $i++;
                 $self->$cb(@_);
                 1;
-              };
+                };
         }
     }
     else {
@@ -99,7 +102,7 @@ sub unsubscribe {
             splice @events, $index, 1;
             splice @onces,  $index, 1;
             $self->backend->event_delete($name) and return $self
-              unless @events;
+                unless @events;
             $self->backend->event_update( $name, \@events, 0 );
             $self->backend->once_update( $name, \@onces );
         }
@@ -126,7 +129,7 @@ sub _unsubscribe_index {
     splice @events, $index, 1;
     splice @onces,  $index, 1;
     $self->backend->event_delete($name) and return $self
-      unless @events;
+        unless @events;
     $self->backend->event_update( $name, [@events], 0 );
     $self->backend->once_update( $name, \@onces );
 
