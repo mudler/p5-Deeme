@@ -1,4 +1,4 @@
-use Mojo::Base -strict;
+use Deeme::Obj -strict;
 
 use Test::More;
 use Deeme;
