@@ -7,7 +7,6 @@ use Carp 'croak';
 has 'backend';
 use Scalar::Util qw(blessed weaken);
 use constant DEBUG => $ENV{DEEME_DEBUG} || 0;
-use Carp::Always;
 
 sub new {
     my $self = shift;
@@ -79,11 +78,15 @@ sub has_subscribers { !!@{ shift->subscribers(shift) } }
 
 sub on {
     my ( $self, $name, $cb ) = @_;
+    warn "-- on $name in @{[blessed $self]}\n"
+        if DEBUG;
     return $self->backend->event_add( $name, $cb ||= [], 0 );
 }
 
 sub once {
     my ( $self, $name, $cb ) = @_;
+    warn "-- once $name in @{[blessed $self]}\n"
+        if DEBUG;
     return $self->backend->event_add( $name, $cb ||= [], 1 );
 }
 
@@ -144,7 +147,8 @@ use constant DEBUG => $ENV{DEEME_DEBUG} || 0;
 sub dequeue_event {
     my ( $self, $name ) = ( shift, shift );
     if ( my $s = $self->backend->events_get($name) ) {
-        warn "-- dequeue $name in @{[blessed $self]} (@{[scalar @$s]})\n"
+        warn
+            "Worker -- dequeue $name in @{[blessed $self]} (@{[scalar @$s]})\n"
             if DEBUG;
         my @onces = $self->backend->events_onces($name);
         my $i     = 0;
@@ -153,7 +157,13 @@ sub dequeue_event {
                 ? ( splice( @onces, $i, 1 )
                     and $self->_unsubscribe_index( $name => $i ) )
                 : $i++;
-            push( @{ $self->{'queue'} }, $cb );
+            push(
+                @{ $self->{'queue'} },
+                Deeme::Job->new(
+                    deeme => $self,
+                    cb    => $cb
+                )
+            );
         }
     }
     return @{ $self->{'queue'} };
@@ -164,16 +174,13 @@ sub dequeue {
     my $name = shift;
     if ( my $s = $self->backend->events_get($name) ) {
         warn
-            "-- dequeue $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
+            "Worker -- dequeue $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
             if DEBUG;
-        my @onces = $self->backend->events_onces($name);
-        my $cb    = Deeme::Job->new(
+        my $cb = Deeme::Job->new(
             deeme => $self,
-            cb    => shift @$s
+            cb    => @$s[0]
         );
-        splice( @onces, 0, 1 )
-            and $self->_unsubscribe_index( $name => 0 )
-            if ( $onces[0] == 1 );
+        $self->_unsubscribe_index( $name, 0 );
         push( @{ $self->{'queue'} }, $cb );
     }
     return @{ $self->{'queue'} }[0];
@@ -206,12 +213,8 @@ has [qw(cb deeme)];
 sub process {
     my $self = shift;
     my $cb   = $self->cb;
-    use Data::Dumper;
-    say Dumper( $self->deeme->{queue} );
     $self->deeme->{'queue'}
         = [ grep { $self ne $_ } @{ $self->deeme->{'queue'} } ];
-    say Dumper( $self->deeme->{queue} );
-
     return eval { $self->$cb(@_); 1; };
 }
 
