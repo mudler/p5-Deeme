@@ -7,6 +7,7 @@ use Carp 'croak';
 has 'backend';
 use Scalar::Util qw(blessed weaken);
 use constant DEBUG => $ENV{DEEME_DEBUG} || 0;
+use Carp::Always;
 
 sub new {
     my $self = shift;
@@ -134,6 +135,84 @@ sub _unsubscribe_index {
     $self->backend->once_update( $name, \@onces );
 
     return $self;
+}
+
+package Deeme::Worker;
+use Deeme::Obj "Deeme";
+use constant DEBUG => $ENV{DEEME_DEBUG} || 0;
+
+sub dequeue_event {
+    my ( $self, $name ) = ( shift, shift );
+    if ( my $s = $self->backend->events_get($name) ) {
+        warn "-- dequeue $name in @{[blessed $self]} (@{[scalar @$s]})\n"
+            if DEBUG;
+        my @onces = $self->backend->events_onces($name);
+        my $i     = 0;
+        for my $cb (@$s) {
+            ( $onces[$i] == 1 )
+                ? ( splice( @onces, $i, 1 )
+                    and $self->_unsubscribe_index( $name => $i ) )
+                : $i++;
+            push( @{ $self->{'queue'} }, $cb );
+        }
+    }
+    return @{ $self->{'queue'} };
+}
+
+sub dequeue {
+    my $self = shift;
+    my $name = shift;
+    if ( my $s = $self->backend->events_get($name) ) {
+        warn
+            "-- dequeue $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
+            if DEBUG;
+        my @onces = $self->backend->events_onces($name);
+        my $cb    = Deeme::Job->new(
+            deeme => $self,
+            cb    => shift @$s
+        );
+        splice( @onces, 0, 1 )
+            and $self->_unsubscribe_index( $name => 0 )
+            if ( $onces[0] == 1 );
+        push( @{ $self->{'queue'} }, $cb );
+    }
+    return @{ $self->{'queue'} }[0];
+}
+
+sub process {
+    my $self = shift;
+    return @{ $self->{'queue'} } > 0
+        ? @{ $self->{'queue'} }[0]->process(@_)
+        : undef;
+}
+
+sub process_all {
+    my $self = shift;
+    my @args = @_;
+    my @returns;
+    while ( my $job = shift @{ $self->{'queue'} } ) {
+        push( @returns, $job->process(@args) );
+    }
+    return @returns;
+}
+
+sub add { return shift->once(@_) }
+
+package Deeme::Job;
+use Deeme::Obj -base;
+use feature 'say';
+has [qw(cb deeme)];
+
+sub process {
+    my $self = shift;
+    my $cb   = $self->cb;
+    use Data::Dumper;
+    say Dumper( $self->deeme->{queue} );
+    $self->deeme->{'queue'}
+        = [ grep { $self ne $_ } @{ $self->deeme->{'queue'} } ];
+    say Dumper( $self->deeme->{queue} );
+
+    return eval { $self->$cb(@_); 1; };
 }
 
 1;
