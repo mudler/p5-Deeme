@@ -176,6 +176,8 @@ Deeme - a Database-agnostic driven Event Emitter
 Deeme is a database-agnostic driven event emitter base-class.
 Deeme allows you to define binding subs on different points in multiple applications, and execute them later, in another worker. It is handy if you have to attach subs to events that are delayed in time and must be fixed. It can act also like a jobqueue and It is strongly inspired by (and a rework of) L<Mojo::EventEmitter>.
 
+Have a look at L<Deeme::Worker> for the jobqueue functionality.
+
 =head1 EVENTS
 
 L<Deeme> can emit the following events.
@@ -294,6 +296,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Deeme::Backend::Memory>, L<Deeme::Backend::Mango>, L<Deeme::Backend::Meerkat>, L<Mojo::EventEmitter>, L<Mojolicious>
+L<Deeme::Worker>, L<Deeme::Backend::Memory>, L<Deeme::Backend::Mango>, L<Deeme::Backend::Meerkat>, L<Mojo::EventEmitter>, L<Mojolicious>
 
 =cut
