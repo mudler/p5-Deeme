@@ -1,6 +1,6 @@
 # NAME
 
-Deeme - a Database-agnostic driven Event Emitter
+[![Build Status](https://travis-ci.org/mudler/p5-Deeme.svg?branch=master)](https://travis-ci.org/mudler/p5-Deeme) Deeme - a Database-agnostic driven Event Emitter
 
 # SYNOPSIS
 
@@ -28,6 +28,8 @@ Deeme - a Database-agnostic driven Event Emitter
 
 Deeme is a database-agnostic driven event emitter base-class.
 Deeme allows you to define binding subs on different points in multiple applications, and execute them later, in another worker. It is handy if you have to attach subs to events that are delayed in time and must be fixed. It can act also like a jobqueue and It is strongly inspired by (and a rework of) [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter).
+
+Have a look at [Deeme::Worker](https://metacpan.org/pod/Deeme::Worker) for the jobqueue functionality.
 
 # EVENTS
 
@@ -147,4 +149,4 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[Deeme::Backend::Memory](https://metacpan.org/pod/Deeme::Backend::Memory), [Deeme::Backend::Mango](https://metacpan.org/pod/Deeme::Backend::Mango), [Deeme::Backend::Meerkat](https://metacpan.org/pod/Deeme::Backend::Meerkat), [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter), [Mojolicious](https://metacpan.org/pod/Mojolicious)
+[Deeme::Worker](https://metacpan.org/pod/Deeme::Worker), [Deeme::Backend::Memory](https://metacpan.org/pod/Deeme::Backend::Memory), [Deeme::Backend::Mango](https://metacpan.org/pod/Deeme::Backend::Mango), [Deeme::Backend::Meerkat](https://metacpan.org/pod/Deeme::Backend::Meerkat), [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter), [Mojolicious](https://metacpan.org/pod/Mojolicious)
