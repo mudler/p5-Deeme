@@ -27,7 +27,7 @@ Deeme - a Database-agnostic driven Event Emitter
 # DESCRIPTION
 
 Deeme is a database-agnostic driven event emitter base-class.
-Deeme allows you to define binding subs on different points in multiple applications, and execute them later, in another worker. It is handy if you have to attach subs to events that are delayed in time and must be fixed. It is strongly inspired by (and a rework of) [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter).
+Deeme allows you to define binding subs on different points in multiple applications, and execute them later, in another worker. It is handy if you have to attach subs to events that are delayed in time and must be fixed. It can act also like a jobqueue and It is strongly inspired by (and a rework of) [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter).
 
 # EVENTS
 
