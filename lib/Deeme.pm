@@ -1,7 +1,7 @@
 package Deeme;
 use strict;
 use 5.008_005;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use Deeme::Obj -base;
 use Carp 'croak';
 has 'backend';
@@ -12,8 +12,7 @@ sub new {
     my $self = shift;
     $self = $self->SUPER::new(@_);
     if ( !$self->backend ) {
-        warn 'No backend defined, defaulting to Deeme::Backend::Memory';
-        use Deeme::Backend::Memory;
+        require Deeme::Backend::Memory;
         $self->backend( Deeme::Backend::Memory->new );
     }
     $self->backend->deeme($self);
@@ -140,83 +139,6 @@ sub _unsubscribe_index {
     return $self;
 }
 
-package Deeme::Worker;
-use Deeme::Obj "Deeme";
-use constant DEBUG => $ENV{DEEME_DEBUG} || 0;
-
-sub dequeue_event {
-    my ( $self, $name ) = ( shift, shift );
-    if ( my $s = $self->backend->events_get($name) ) {
-        warn
-            "Worker -- dequeue $name in @{[blessed $self]} (@{[scalar @$s]})\n"
-            if DEBUG;
-        my @onces = $self->backend->events_onces($name);
-        my $i     = 0;
-        for my $cb (@$s) {
-            ( $onces[$i] == 1 )
-                ? ( splice( @onces, $i, 1 )
-                    and $self->_unsubscribe_index( $name => $i ) )
-                : $i++;
-            push(
-                @{ $self->{'queue'} },
-                Deeme::Job->new(
-                    deeme => $self,
-                    cb    => $cb
-                )
-            );
-        }
-    }
-    return @{ $self->{'queue'} };
-}
-
-sub dequeue {
-    my $self = shift;
-    my $name = shift;
-    if ( my $s = $self->backend->events_get($name) ) {
-        warn
-            "Worker -- dequeue $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
-            if DEBUG;
-        my $cb = Deeme::Job->new(
-            deeme => $self,
-            cb    => @$s[0]
-        );
-        $self->_unsubscribe_index( $name, 0 );
-        push( @{ $self->{'queue'} }, $cb );
-    }
-    return @{ $self->{'queue'} }[0];
-}
-
-sub process {
-    my $self = shift;
-    return @{ $self->{'queue'} } > 0
-        ? @{ $self->{'queue'} }[0]->process(@_)
-        : undef;
-}
-
-sub process_all {
-    my $self = shift;
-    my @args = @_;
-    my @returns;
-    while ( my $job = shift @{ $self->{'queue'} } ) {
-        push( @returns, $job->process(@args) );
-    }
-    return @returns;
-}
-
-sub add { return shift->once(@_) }
-
-package Deeme::Job;
-use Deeme::Obj -base;
-use feature 'say';
-has [qw(cb deeme)];
-
-sub process {
-    my $self = shift;
-    my $cb   = $self->cb;
-    $self->deeme->{'queue'}
-        = [ grep { $self ne $_ } @{ $self->deeme->{'queue'} } ];
-    return eval { $self->$cb(@_); 1; };
-}
 
 1;
 __END__
@@ -252,7 +174,7 @@ Deeme - a Database-agnostic driven Event Emitter
 =head1 DESCRIPTION
 
 Deeme is a database-agnostic driven event emitter base-class.
-Deeme allows you to define binding subs on different points in multiple applications, and execute them later, in another worker. It is handy if you have to attach subs to events that are delayed in time and must be fixed. It is strongly inspired by (and a rework of) L<Mojo::EventEmitter>.
+Deeme allows you to define binding subs on different points in multiple applications, and execute them later, in another worker. It is handy if you have to attach subs to events that are delayed in time and must be fixed. It can act also like a jobqueue and It is strongly inspired by (and a rework of) L<Mojo::EventEmitter>.
 
 =head1 EVENTS
 

@@ -1,30 +1,56 @@
 use Deeme::Obj -strict;
 use Test::More;
-use Deeme;
-#use_ok("Deeme::Job");
+use_ok("Deeme::Worker");
+use_ok("Deeme::Job");
+use Deeme::Job;
+use Deeme::Worker;
 # Normal event
-my $e = Deeme::Worker->new( );
+my $e = Deeme::Worker->new();
 
 my $called;
-$e->add( test1 => sub { $called+=$_[1];} );
+$e->add( test1 => sub { $called += $_[1]; } );
 
-while($e->dequeue("test1")){
+while ( $e->dequeue("test1") ) {
     $e->process(1);
 }
 is $called, 1, ' 1 job was processed';
 
-while($e->dequeue("test1")){
+while ( $e->dequeue("test1") ) {
     $e->process(1);
 }
 is $called, 1, ' no job was processed';
 
-$e->add( test2 => sub { $called+=$_[1]; print "Hey!\n";} );
-$e->add( test2 => sub { $called+=$_[1]+1;print "Hey+1!\n";} );
-use Data::Dumper;
-print Dumper($e);
-while( my $Job=$e->dequeue("test2")){
-    $Job->process(1);
-    print Dumper($e);
+$e->add( test2 => sub { $called += $_[1]; } );
 
+$e->add( test2 => sub { $called += $_[1]; } );
+
+while ( my $Job = $e->dequeue("test2") ) {
+    $Job->process(1);
 }
-is $called, 4, ' 2 job was processed';
+is $called, 3, ' +2 job where processed';
+while ( $e->dequeue("test2") ) {
+    $e->process(1);
+}
+
+is $called, 3, ' no jobs where processed';
+$called = 0;
+$e->add( test2 => sub { $called += $_[1]; } );
+
+$e->add( test2 => sub { $called += $_[1]; } );
+
+while ( $e->dequeue("test2") ) {
+    $e->process(1);
+}
+
+is $called, 2, ' 2 jobs where processed again';
+
+$called = 0;
+$e->add( test2 => sub { $called += $_[1]; } );
+
+$e->add( test2 => sub { $called += $_[1]; } );
+$e->dequeue_event("test2");
+$e->process_all(1);
+is $called, 2,
+    ' 2 jobs where processed again with dequeue_event and process_all';
+
+done_testing();
