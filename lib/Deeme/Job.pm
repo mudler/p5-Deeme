@@ -1,6 +1,5 @@
 package Deeme::Job;
 use Deeme::Obj -base;
-use feature 'say';
 has [qw(cb deeme)];
 
 sub process {
