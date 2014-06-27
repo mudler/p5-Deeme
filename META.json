@@ -35,10 +35,12 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "feature" : "0"
+         },
          "requires" : {
             "MIME::Base64" : "0",
             "Scalar::Util" : "0",
-            "feature" : "0",
             "perl" : "5.008_005"
          }
       },

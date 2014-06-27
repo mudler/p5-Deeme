@@ -1,6 +1,8 @@
 Revision history for Deeme
 
 {{$NEXT}}
+
+0.03  2014-06-27 15:21:51 CEST
         - Deeme can act also as a job queue
         - added Deeme::Worker (job consumer) and Deeme::Job (the actual job)
 
