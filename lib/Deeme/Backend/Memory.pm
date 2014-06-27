@@ -9,7 +9,7 @@ use Carp 'croak';
 sub events_get {
     my $self        = shift;
     my $name        = shift;
-    my $deserialize = shift // 1;
+    my $deserialize = shift || 1;
     #deserializing subs and returning a reference
     #return undef if ( !$event );
     return $self->{'events'}{$name}{'functions'};
@@ -38,7 +38,7 @@ sub event_add {
     my $self = shift;
     my $name = shift;
     my $cb   = shift;
-    my $once = shift // 0;
+    my $once = shift || 0;
       push @{$self->{'events'}{$name}{'functions'} ||= []}, $cb;
       push @{$self->{'events'}{$name}{'onces'} ||= []}, $once;
 
