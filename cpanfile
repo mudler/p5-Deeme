@@ -1,6 +1,6 @@
 requires 'MIME::Base64';
 requires 'Scalar::Util';
-requires 'feature';
+recommends 'feature';
 requires 'perl', '5.008_005';
 
 on configure => sub {
