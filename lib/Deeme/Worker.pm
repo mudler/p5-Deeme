@@ -90,7 +90,7 @@ Deeme::Worker - represent a Deeme worker that process jobs
 
   #then, later in another application
   # app2.pl
-  my $worker_tiger = Cat->JobQueue(backend=> Deeme::Backend::Mango->new(...));
+  my $worker_tiger = JobQueue->new(backend=> Deeme::Backend::Mango->new(...));
   while(my $Job=$worker_tiger->dequeue("roar")){
     $Job->process(@args);
   }
