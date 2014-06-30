@@ -5,7 +5,7 @@ our $VERSION = '0.04';
 use Deeme::Obj -base;
 use Carp 'croak';
 has 'backend';
-use Scalar::Util qw(blessed weaken);
+use Scalar::Util qw(blessed);
 use constant DEBUG => $ENV{DEEME_DEBUG} || 0;
 
 sub new {
