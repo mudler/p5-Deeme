@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use utf8;
 
-#use feature ();
-
 our $feature = eval {
     require feature;
     feature->import();
@@ -45,7 +43,7 @@ sub import {
         *{"${caller}::has"} = sub { attr( $caller, @_ ) };
     }
 
-    # Mojo modules are strict!
+    # Deeme modules are strict!
     $_->import for qw(strict warnings utf8);
     if ($feature) {
         feature->import(':5.10');

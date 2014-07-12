@@ -10,15 +10,15 @@ sub events_get {
 
 sub events_reset {
     croak 'Method "events_reset" not implemented by subclass';
-}    #get events
+}    #reset events
 
 sub events_onces {
     croak 'Method "events_onces" not implemented by subclass';
-}    #get events
+}    #onces of events
 
 sub once_update {
     croak 'Method "once_update" not implemented by subclass';
-}
+} #once updates
 
 sub event_add {
     croak 'Method "event_add" not implemented by subclass';

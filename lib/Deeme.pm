@@ -89,7 +89,7 @@ sub once {
     return $self->backend->event_add( $name, $cb ||= [], 1 );
 }
 
-sub subscribers { shift->backend->events_get( shift(), 0 ) || [] }
+sub subscribers { shift->backend->events_get( shift, 0 ) || [] }
 
 sub unsubscribe {
     my ( $self, $name, $cb ) = @_;
