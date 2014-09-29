@@ -2,8 +2,13 @@ package Deeme::Worker;
 use Deeme::Obj "Deeme";
 use constant DEBUG => $ENV{DEEME_DEBUG} || 0;
 
+sub jobs {
+    my $j;
+    return ( $j = shift->backend->events_get(shift) ) ? scalar @$j : 0;
+}
+
 sub dequeue_event {
-    my ( $self, $name ) = ( shift, shift );
+    my ( $self, $name ) = @_;
     if ( my $s = $self->backend->events_get($name) ) {
         warn
             "Worker -- dequeue $name in @{[blessed $self]} (@{[scalar @$s]})\n"
@@ -28,8 +33,8 @@ sub dequeue_event {
 }
 
 sub dequeue {
-    my $self = shift;
-    my $name = shift;
+    my ( $self, $name ) = @_;
+
     if ( my $s = $self->backend->events_get($name) ) {
         warn
             "Worker -- dequeue $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
@@ -74,7 +79,7 @@ Deeme::Worker - represent a Deeme worker that process jobs
 =head1 SYNOPSIS
 
   package JobQueue;
-  use Deeme::Obj 'Deeme';
+  use Deeme::Obj 'Deeme::Worker';
   use Deeme::Backend::Mango;
 
   # app1.pl
@@ -126,6 +131,12 @@ implements the following new ones.
   $e = $e->add(test1=> sub {...});
 
 Subscribe to L</"test1"> jobqueue.
+
+=head2 jobs
+
+  $n = $e->jobs('test1');
+
+Returns the number of jobs in the queue
 
 =head2 dequeue
 

@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/mudler/p5-Deeme.png?branch=master)](https://travis-ci.org/mudler/p5-Deeme)
 # NAME
 
 Deeme - a Database-agnostic driven Event Emitter
