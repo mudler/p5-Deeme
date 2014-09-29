@@ -1,6 +1,8 @@
 Revision history for Deeme
 
 {{$NEXT}}
+
+0.05 2014-09-29T20:38:56Z
         - Added jobs() in Deeme::Worker, fixed POD
 
 0.04  2014-06-29 11:27:19 CEST

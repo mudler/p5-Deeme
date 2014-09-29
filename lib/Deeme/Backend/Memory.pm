@@ -2,7 +2,7 @@ package Deeme::Backend::Memory;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.01';
+our $VERSION = '0.05';
 use Deeme::Obj 'Deeme::Backend';
 use Carp 'croak';
 
