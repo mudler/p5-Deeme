@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Deeme::Util" : "0",
+            "Digest::MD5" : "0",
             "EV" : "4.0",
             "Hash::Util::FieldHash" : "0",
             "IO::Pipely" : "0",

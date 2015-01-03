@@ -1,6 +1,7 @@
 package Deeme::Utils;
 use base qw(Exporter);
 use constant DEBUG => $ENV{DEBUG} || 0;
+use Term::ANSIColor;                                                                                                                                                                                                                           
 
 use B::Deparse;
 use MIME::Base64 qw( encode_base64  decode_base64);
@@ -9,7 +10,7 @@ use Time::HiRes ();
 use constant MONOTONIC => eval
     '!!Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC())';
 our @EXPORT = qw(message DEBUG info warning error);
-our @EXPORT_OK = qw (_serialize _deserialize b64_decode b64_encode class_to_path _stash);
+our @EXPORT_OK = qw (_serialize _deserialize b64_decode b64_encode class_to_path _stash md5_sum steady_time);
 our $deparse   = B::Deparse->new;
 sub b64_decode    { decode_base64( $_[0] ) }
 sub b64_encode    { encode_base64( $_[0], $_[1] ) }
