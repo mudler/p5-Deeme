@@ -3,7 +3,7 @@ use Deeme::Obj 'Deeme::Reactor';
 
 use IO::Poll qw(POLLERR POLLHUP POLLIN POLLOUT POLLPRI);
 use List::Util 'min';
-use Deeme::Util qw(md5_sum steady_time);
+use Deeme::Utils qw(md5_sum steady_time);
 use Time::HiRes 'usleep';
 
 sub again {

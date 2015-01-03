@@ -9,11 +9,11 @@ use Deeme::IOLoop::Delay;
 use Deeme::IOLoop::Server;
 use Deeme::IOLoop::Stream;
 use Deeme::Reactor::Poll;
-use Deeme::Util qw(md5_sum steady_time);
+use Deeme::Utils qw(md5_sum steady_time);
 use Scalar::Util qw(blessed weaken);
 use feature 'state';
 
-use constant DEBUG => $ENV{Deeme_IOLOOP_DEBUG} || 0;
+use constant DEBUG => $ENV{DEEME_IOLOOP_DEBUG} || 0;
 
 has accept_interval => 0.025;
 has [qw(lock unlock)];

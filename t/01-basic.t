@@ -1,8 +1,6 @@
 use strict;
 use Test::More;
-use_ok("Deeme");
+use_ok($_) for qw(Deeme Deeme::Watcher);
 
-# replace with the actual test
-ok 1;
 
 done_testing;

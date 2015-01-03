@@ -4,7 +4,7 @@
       "mudler <mudler@dark-lab.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Minilla/v2.2.1, CPAN::Meta::Converter version 2.142060",
    "license" : [
       "perl_5"
    ],
@@ -28,8 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38",
-            "Module::Build::Tiny" : "0.035"
+            "Module::Build" : "0.38"
          }
       },
       "develop" : {
@@ -42,12 +41,18 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "feature" : "0"
-         },
          "requires" : {
+            "Deeme::Util" : "0",
+            "EV" : "4.0",
+            "Hash::Util::FieldHash" : "0",
+            "IO::Pipely" : "0",
+            "List::Util" : "0",
             "MIME::Base64" : "0",
+            "Perl::OSType" : "0",
             "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Time::HiRes" : "0",
+            "feature" : "0",
             "perl" : "5.008005"
          }
       },
@@ -69,5 +74,5 @@
          "web" : "https://github.com/mudler/p5-Deeme"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06"
 }

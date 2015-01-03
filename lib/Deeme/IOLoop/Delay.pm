@@ -2,7 +2,7 @@ package Deeme::IOLoop::Delay;
 use Deeme -base;
 
 use Deeme::IOLoop;
-use Deeme::Util;
+use Deeme::Utils;
 use Hash::Util::FieldHash 'fieldhash';
 
 has ioloop => sub { Deeme::IOLoop->singleton };

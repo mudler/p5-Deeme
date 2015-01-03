@@ -1,4 +1,4 @@
-requires 'Deeme::Util';
+requires 'Digest::MD5';
 requires 'EV', '4.0';
 requires 'Hash::Util::FieldHash';
 requires 'IO::Pipely';
