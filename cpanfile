@@ -7,6 +7,7 @@ requires 'MIME::Base64';
 requires 'Perl::OSType';
 requires 'Scalar::Util';
 requires 'Socket';
+requires 'Term::ANSIColor';
 requires 'Time::HiRes';
 requires 'feature';
 requires 'perl', '5.008_005';

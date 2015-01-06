@@ -14,7 +14,6 @@ The Watcher holds the loop, and here you can set where to listen
 #use Deeme -base;
 use Deeme::Obj "Deeme::IOLoop";
 use Carp;
-use feature 'say';
 use Storable 'dclone';
 
 
